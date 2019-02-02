@@ -1,2 +1,2 @@
 # MKLBO
-Multi-Kernel Learning With Bayesian Optimization 
+Multi-Kernel Learning with Bayesian Optimization 
