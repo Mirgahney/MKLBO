@@ -99,3 +99,9 @@ optimizer = BayesianOptimization(
     pbounds=pbounds,
     random_state=1,
 )
+
+# preform the optimization
+optimizer.maximize(
+    init_points=4,
+   n_iter=50,
+)
