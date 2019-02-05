@@ -57,3 +57,35 @@ def KFold_train_score(X, Y_train,kf,clf, metrics, print_report = False):
         i+=1
     
     return np.mean(score, axis=0)
+
+# Roubost KFolds
+def roubst_KCV(n_rand, X,Y_train,kf,clf, metrics, print_report = False):
+    d = len(metrics)
+    roubst_score = np.zeros((n_rand, d))
+    for n in range(n_rand):
+        roubst_score[n,:] = KFold_train(X,Y_train,kf,clf, metrics, print_report = False)
+    return np.mean(roubst_score, axis=0), np.std(roubst_score, axis=0)
+
+def roubst_KCV_score(n_rand, X,Y_train,kf,clf, metrics, print_report = False):
+    d = len(metrics)
+    roubst_score = np.zeros((n_rand, d))
+    for n in range(n_rand):
+        roubst_score[n,:] = KFold_train_score(X,Y_train,kf,clf, metrics, print_report = False)
+    return np.mean(roubst_score, axis=0), np.std(roubst_score, axis=0)
+
+# defining black box function for BO
+def black_box_function(alph, beta, epsolon, psi):
+    """Function with unknown internals we wish to maximize.
+
+    This is just serving as an example, for all intents and
+    purposes think of the internals of this function, i.e.: the process
+    which generates its output values, as unknown.
+    """
+    combined_kernel = lambda x, y: \
+    alph * K_exp(x, y) + beta * K_lin(x, y) + epsolon * K_poly(x, y) + psi * K_mat(x, y)
+    
+    svm_clf = SVC(kernel=combined_kernel)
+    #np.random.seed(42)
+    m, std = roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score])
+#     m, std = KFold_train_score(X,Y_train, kf, svm_clf,[roc_auc_score])
+    return m[0] + std[0]/2
