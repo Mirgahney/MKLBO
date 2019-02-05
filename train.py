@@ -105,3 +105,13 @@ optimizer.maximize(
     init_points=4,
    n_iter=50,
 )
+
+# printing the final result
+print(optimizer.max['params'])
+combined_kernel = lambda x, y: \
+    optimizer.max['params']['alph'] * K_exp(x, y) + optimizer.max['params']['beta'] * K_lin(x, y) + optimizer.max['params']['epsolon'] * K_poly(x, y) + \
+    optimizer.max['params']['psi'] * K_mat(x, y)
+# np.random.seed(42)
+svm_clf = SVC(kernel=combined_kernel)
+print(roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score, f1_score]))
+print(roubst_KCV_score(5,X,Y_train, kf, svm_clf,[roc_auc_score]))
