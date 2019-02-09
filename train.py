@@ -5,7 +5,6 @@ from bayes_opt import BayesianOptimization
 import pandas as pd
 
 # reading data
-
 X = pd.read_csv('data/train_X.csv')
 y = pd.read_csv('data/train_y.csv')
 
@@ -14,6 +13,13 @@ K_exp  = Kinterface(data=X, kernel=rbf_kernel,  kernel_args={"sigma": 0.0003}) #
 K_poly = Kinterface(data=X, kernel=poly_kernel, kernel_args={"b": 3})      # polynomial kernel with degree=3
 K_lin  = Kinterface(data=X, kernel=linear_kernel)                          # linear kernel
 K_mat  = Kinterface(data=X, kernel=matern_kernel)
+
+# redaing routine
+def read_data(path):
+	X = pd.read_csv(path+'train_X.csv')
+	y = pd.read_csv(path+'train_y.csv')
+
+	return X,y
 
 # np.random.seed(42)
 kf = KFold(n_splits=3, shuffle=True)
