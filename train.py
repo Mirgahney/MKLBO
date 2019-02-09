@@ -127,7 +127,7 @@ def train(X,y, alph_bound = (0,5), beta_bound= (0,5), epsolon_bound= (0,5), psi_
 	    optimizer.max['params']['psi'] * K_mat(x, y)
 	
 	svm_clf = SVC(kernel=combined_kernel)
-	
+
 	return svm_clf
 
 # printing the final result
@@ -139,3 +139,11 @@ combined_kernel = lambda x, y: \
 svm_clf = SVC(kernel=combined_kernel)
 print(roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score, f1_score]))
 print(roubst_KCV_score(5,X,Y_train, kf, svm_clf,[roc_auc_score]))
+
+# wriring the result to a file
+with open('result/result.txt','w') as f:
+	f.write('MKLBO with 4 kerels\n')
+	f.write('Accuracy score  Precision score  Recall score  F1 score\n')
+	f.write(str(roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score, f1_score]) + '\n'))
+	f.write('AUC ROC\n')
+	f.write(str(roubst_KCV_score(5,X,Y_train, kf, svm_clf,[roc_auc_score]), + '\n'))
