@@ -2,7 +2,12 @@ from sklearn.svm import SVC
 from mklaren.kernel.kinterface import Kinterface
 from mklaren.kernel.kernel import linear_kernel, poly_kernel, matern_kernel
 from bayes_opt import BayesianOptimization
+import pandas as pd
 
+# reading data
+
+X = pd.read_csv('data/train_X.csv')
+y = pd.read_csv('data/train_y.csv')
 
 # defining the kernels
 K_exp  = Kinterface(data=X, kernel=rbf_kernel,  kernel_args={"sigma": 0.0003}) # RBF kernel 
