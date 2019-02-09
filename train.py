@@ -84,38 +84,51 @@ def roubst_KCV_score(n_rand, X,Y_train,kf,clf, metrics, print_report = False):
         roubst_score[n,:] = KFold_train_score(X,Y_train,kf,clf, metrics, print_report = False)
     return np.mean(roubst_score, axis=0), np.std(roubst_score, axis=0)
 
+# training routine 
+def train(X,y, alph_bound = (0,5), beta_bound= (0,5), epsolon_bound= (0,5), psi_bound= (0,5)):
+
 # defining black box function for BO
-def black_box_function(alph, beta, epsolon, psi):
-    """Function with unknown internals we wish to maximize.
+	def black_box_function(alph, beta, epsolon, psi):
+	    """Function with unknown internals we wish to maximize.
 
-    This is just serving as an example, for all intents and
-    purposes think of the internals of this function, i.e.: the process
-    which generates its output values, as unknown.
-    """
-    combined_kernel = lambda x, y: \
-    alph * K_exp(x, y) + beta * K_lin(x, y) + epsolon * K_poly(x, y) + psi * K_mat(x, y)
-    
-    svm_clf = SVC(kernel=combined_kernel)
-    #np.random.seed(42)
-    m, std = roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score])
-#     m, std = KFold_train_score(X,Y_train, kf, svm_clf,[roc_auc_score])
-    return m[0] + std[0]/2
+	    This is just serving as an example, for all intents and
+	    purposes think of the internals of this function, i.e.: the process
+	    which generates its output values, as unknown.
+	    """
+	    combined_kernel = lambda x, y: \
+	    alph * K_exp(x, y) + beta * K_lin(x, y) + epsolon * K_poly(x, y) + psi * K_mat(x, y)
+	    
+	    svm_clf = SVC(kernel=combined_kernel)
+	    #np.random.seed(42)
+	    m, std = roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score])
+	#     m, std = KFold_train_score(X,Y_train, kf, svm_clf,[roc_auc_score])
+	    return m[0] + std[0]/2
 
-# Bounded region of parameter space
-pbounds = {'alph': (0, 5), 'beta': (0, 5),'epsolon':(0,5), 'psi' : (0,5)}
+	# Bounded region of parameter space
+	pbounds = {'alph': (0, 5), 'beta': (0, 5),'epsolon':(0,5), 'psi' : (0,5)}
 
-# BO Optimizer
-optimizer = BayesianOptimization(
-    f=black_box_function,
-    pbounds=pbounds,
-    random_state=1,
-)
+	# BO Optimizer
+	optimizer = BayesianOptimization(
+	    f=black_box_function,
+	    pbounds=pbounds,
+	    random_state=1,
+	)
 
-# preform the optimization
-optimizer.maximize(
-    init_points=4,
-   n_iter=50,
-)
+	# preform the optimization
+	optimizer.maximize(
+	    init_points=4,
+	   n_iter=50,
+	)
+
+	# printing the final result
+	print(optimizer.max['params'])
+	combined_kernel = lambda x, y: \
+	    optimizer.max['params']['alph'] * K_exp(x, y) + optimizer.max['params']['beta'] * K_lin(x, y) + optimizer.max['params']['epsolon'] * K_poly(x, y) + \
+	    optimizer.max['params']['psi'] * K_mat(x, y)
+	
+	svm_clf = SVC(kernel=combined_kernel)
+	
+	return svm_clf
 
 # printing the final result
 print(optimizer.max['params'])
