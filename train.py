@@ -3,6 +3,7 @@ from mklaren.kernel.kinterface import Kinterface
 from mklaren.kernel.kernel import linear_kernel, poly_kernel, matern_kernel
 from bayes_opt import BayesianOptimization
 import pandas as pd
+import argparse
 
 # reading data
 X = pd.read_csv('data/train_X.csv')
@@ -147,3 +148,13 @@ with open('result/result.txt','w') as f:
 	f.write(str(roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score, f1_score]) + '\n'))
 	f.write('AUC ROC\n')
 	f.write(str(roubst_KCV_score(5,X,Y_train, kf, svm_clf,[roc_auc_score]), + '\n'))
+
+def main():
+
+	# reading data
+	print('Reading data ----------------- \n')
+	X,y = read_data(path)
+
+	
+if __name__ == 'main':
+	main()
