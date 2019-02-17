@@ -150,11 +150,10 @@ with open('result/result.txt','w') as f:
 	f.write(str(roubst_KCV_score(5,X,Y_train, kf, svm_clf,[roc_auc_score]), + '\n'))
 
 def main():
-
 	# reading data
 	print('Reading data ----------------- \n')
 	X,y = read_data(path)
 
-	
+
 if __name__ == 'main':
 	main()
