@@ -1,6 +1,6 @@
 from sklearn.svm import SVC
 from mklaren.kernel.kinterface import Kinterface
-from mklaren.kernel.kernel import linear_kernel, poly_kernel, matern_kernel
+from mklaren.kernel.kernel import linear_kernel, poly_kernel, matern_kernel, rbf_kernel
 from bayes_opt import BayesianOptimization
 import pandas as pd
 import argparse
@@ -8,6 +8,8 @@ import argparse
 # reading data
 X = pd.read_csv('data/train_X.csv')
 y = pd.read_csv('data/train_y.csv')
+columns = np.array(X.columns)
+rows = np.array(X.T.columns)
 
 # defining the kernels
 K_exp  = Kinterface(data=X, kernel=rbf_kernel,  kernel_args={"sigma": 0.0003}) # RBF kernel 
@@ -17,8 +19,11 @@ K_mat  = Kinterface(data=X, kernel=matern_kernel)
 
 # redaing routine
 def read_data(path):
-	X = pd.read_csv(path+'train_X.csv')
-	y = pd.read_csv(path+'train_y.csv')
+
+	X = pd.read_table('http://members.cbio.mines-paristech.fr/~jvert/svn/tutorials/data/breastcancerwang/xtrain.txt',names = columns, index_col=0, low_memory=False)
+	y = pd.read_table('http://members.cbio.mines-paristech.fr/~jvert/svn/tutorials/data/breastcancerwang/ytrain.txt',names= ['label'], index_col=False, low_memory=False)
+	# X = pd.read_csv(path+'train_X.csv')
+	# y = pd.read_csv(path+'train_y.csv')
 
 	return X,y
 
@@ -158,7 +163,7 @@ def main():
 
 	print('\n Result -------------------- \n')
 	print_result(svm_clf)
-	
+
 	print('Saving result ---------------- \n')
 	save_result('result', svm_clf)
 
