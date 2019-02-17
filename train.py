@@ -1,13 +1,16 @@
 from sklearn.svm import SVC
+from sklearn.model_selection import KFold
+from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score # evaluation metrics
 from mklaren.kernel.kinterface import Kinterface
 from mklaren.kernel.kernel import linear_kernel, poly_kernel, matern_kernel, rbf_kernel
 from bayes_opt import BayesianOptimization
 import pandas as pd
 import argparse
+import numpy as np
 
 # reading data
-X = pd.read_csv('data/train_X.csv')
-y = pd.read_csv('data/train_y.csv')
+X = pd.read_csv('data/train_X.csv', low_memory=False)
+y = pd.read_csv('data/train_y.csv', low_memory=False)
 columns = np.array(X.columns)
 rows = np.array(X.T.columns)
 
@@ -27,18 +30,19 @@ def read_data(path):
 
 	return X,y
 
-# np.random.seed(42)
-kf = KFold(n_splits=3, shuffle=True)
-print(kf)  
-
 # KFolde training helper function
-def KFold_train(X,Y_train,kf,clf, metrics, print_report = False):
+def KFold_train(X,Y_train, kf,clf, metrics, print_report = False):
     kf.get_n_splits(X)
     n, d = kf.n_splits, len(metrics)
     score = np.zeros((n, d))
     i = 0
     for train_index, test_index in kf.split(X):
+        print(train_index)
+        print(train_index.shape)
+        print(X.shape)
         X_train, X_test = X[train_index], X[test_index]
+        # print(train_index)
+        # print(Y_train[train_index])
         y_train, y_test = Y_train[train_index], Y_train[test_index]
         
         clf.fit(X_train,y_train)
@@ -53,7 +57,7 @@ def KFold_train(X,Y_train,kf,clf, metrics, print_report = False):
     
     return np.mean(score, axis=0)
 
-def KFold_train_score(X, Y_train,kf,clf, metrics, print_report = False):
+def KFold_train_score(X, Y_train, kf, clf, metrics, print_report = False):
     kf.get_n_splits(X)
     n, d = kf.n_splits, len(metrics)
     score = np.zeros((n, d))
@@ -61,8 +65,6 @@ def KFold_train_score(X, Y_train,kf,clf, metrics, print_report = False):
     for train_index, test_index in kf.split(X):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = Y_train[train_index], Y_train[test_index]
-        print(X_train.shape)
-        print(X_test.shape)
         clf.fit(X_train,y_train)
         pred_y = svm_clf.decision_function(X_test)
         for metric, j in zip(metrics, range(d)):
@@ -91,7 +93,7 @@ def roubst_KCV_score(n_rand, X,Y_train,kf,clf, metrics, print_report = False):
     return np.mean(roubst_score, axis=0), np.std(roubst_score, axis=0)
 
 # training routine 
-def train(X,y, alph_bound = (0,5), beta_bound= (0,5), epsolon_bound= (0,5), psi_bound= (0,5)):
+def train(X,y, kf, alph_bound = (0,5), beta_bound= (0,5), epsolon_bound= (0,5), psi_bound= (0,5)):
 
 # defining black box function for BO
 	def black_box_function(alph, beta, epsolon, psi):
@@ -106,9 +108,10 @@ def train(X,y, alph_bound = (0,5), beta_bound= (0,5), epsolon_bound= (0,5), psi_
 	    
 	    svm_clf = SVC(kernel=combined_kernel)
 	    #np.random.seed(42)
-	    m, std = roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score])
+	    # m, std = roubst_KCV(5 ,X ,y , kf, svm_clf, [accuracy_score, precision_score, recall_score])
+	    m = KFold_train(X,y, kf, svm_clf, [accuracy_score, precision_score, recall_score])
 	#     m, std = KFold_train_score(X,Y_train, kf, svm_clf,[roc_auc_score])
-	    return m[0] + std[0]/2
+	    return m[0] #+ std[0]/2
 
 	# Bounded region of parameter space
 	pbounds = {'alph': (0, 5), 'beta': (0, 5),'epsolon':(0,5), 'psi' : (0,5)}
@@ -156,10 +159,13 @@ def save_result(path, svm_clf):
 def main():
 	# reading data
 	print('Reading data ----------------- \n')
-	X,y = read_data(path)
+	X, y = read_data('data')
+
+	kf = KFold(n_splits=3, shuffle=True)
+	print(kf)  
 
 	print('Training --------------------- \n')
-	svm_clf = train(X,y)
+	svm_clf = train(X, y , kf)
 
 	print('\n Result -------------------- \n')
 	print_result(svm_clf)
@@ -171,5 +177,5 @@ def main():
 
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
 	main()
