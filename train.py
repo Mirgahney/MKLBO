@@ -154,6 +154,11 @@ def main():
 	print('Reading data ----------------- \n')
 	X,y = read_data(path)
 
+	print('Training --------------------- \n')
+	svm_clf = train(X,y)
+
+	
+
 
 if __name__ == 'main':
 	main()
