@@ -142,12 +142,13 @@ print(roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_scor
 print(roubst_KCV_score(5,X,Y_train, kf, svm_clf,[roc_auc_score]))
 
 # wriring the result to a file
-with open('result/result.txt','w') as f:
-	f.write('MKLBO with 4 kerels\n')
-	f.write('Accuracy score  Precision score  Recall score  F1 score\n')
-	f.write(str(roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score, f1_score]) + '\n'))
-	f.write('AUC ROC\n')
-	f.write(str(roubst_KCV_score(5,X,Y_train, kf, svm_clf,[roc_auc_score]), + '\n'))
+def save_result(path):
+	with open('result/result.txt','w') as f:
+		f.write('MKLBO with 4 kerels\n')
+		f.write('Accuracy score  Precision score  Recall score  F1 score\n')
+		f.write(str(roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score, f1_score]) + '\n'))
+		f.write('AUC ROC\n')
+		f.write(str(roubst_KCV_score(5,X,Y_train, kf, svm_clf,[roc_auc_score]), + '\n'))
 
 def main():
 	# reading data
@@ -157,7 +158,7 @@ def main():
 	print('Training --------------------- \n')
 	svm_clf = train(X,y)
 
-	
+
 
 
 if __name__ == 'main':
