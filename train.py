@@ -156,6 +156,9 @@ def main():
 	print('Training --------------------- \n')
 	svm_clf = train(X,y)
 
+	print('\n Result -------------------- \n')
+	print_result(svm_clf)
+	
 	print('Saving result ---------------- \n')
 	save_result('result', svm_clf)
 
