@@ -131,18 +131,16 @@ def train(X,y, alph_bound = (0,5), beta_bound= (0,5), epsolon_bound= (0,5), psi_
 
 	return svm_clf
 
-# printing the final result
-print(optimizer.max['params'])
-combined_kernel = lambda x, y: \
-    optimizer.max['params']['alph'] * K_exp(x, y) + optimizer.max['params']['beta'] * K_lin(x, y) + optimizer.max['params']['epsolon'] * K_poly(x, y) + \
-    optimizer.max['params']['psi'] * K_mat(x, y)
 # np.random.seed(42)
-svm_clf = SVC(kernel=combined_kernel)
-print(roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score, f1_score]))
-print(roubst_KCV_score(5,X,Y_train, kf, svm_clf,[roc_auc_score]))
+def print_result(svm_clf):
+	print('MKLBO with 4 kerels\n')
+	print('Accuracy score  Precision score  Recall score  F1 score\n')
+	print(roubst_KCV(5,X,y,kf, svm_clf,[accuracy_score, precision_score, recall_score, f1_score]))
+	print('AUC ROC\n')
+	print(roubst_KCV_score(5,X,Y_train, kf, svm_clf,[roc_auc_score]))
 
 # wriring the result to a file
-def save_result(path):
+def save_result(path, svm_clf):
 	with open('result/result.txt','w') as f:
 		f.write('MKLBO with 4 kerels\n')
 		f.write('Accuracy score  Precision score  Recall score  F1 score\n')
@@ -157,6 +155,10 @@ def main():
 
 	print('Training --------------------- \n')
 	svm_clf = train(X,y)
+
+	print('Saving result ---------------- \n')
+	save_result('result', svm_clf)
+
 
 
 
